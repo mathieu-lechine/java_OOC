@@ -1,12 +1,12 @@
 package com.cursan.miam;
-
+import java.util.Map;
 
 import java.util.HashMap;
 
 public class Bill {
 
     private Customer customer;
-    private HashMap<Product,Integer> products;
+    private Map<Product,Integer> products = new HashMap<Product, Integer>();
 
     // constructeur
     public Bill(Customer customer) {
@@ -30,7 +30,7 @@ public class Bill {
         return customer;
     }
 
-    public HashMap<Product, Integer> getProducts() {
+    public Map<Product, Integer> getProducts() {
         return products;
     }
 
