@@ -1,16 +1,16 @@
 package com.cursan.miam.web;
 
-import com.cursan.miam.Fridge;
-import com.cursan.miam.Product;
-import com.cursan.miam.Television;
+import com.cursan.miam.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class BillServlet extends HttpServlet {
     List<Product> products = new ArrayList<Product>();
@@ -31,12 +31,11 @@ public class BillServlet extends HttpServlet {
         if(req.getQueryString()==null){
             displayForm(resp);
         } else {
-            displayBill();
+            displayBill(req, resp);
         }
     }
 
-    private void displayBill() {
-    }
+
 
     private void displayForm(HttpServletResponse resp) throws IOException{
         for (int i = 0; i < products.size(); i++) {
@@ -59,5 +58,60 @@ public class BillServlet extends HttpServlet {
                 "<input type=\"submit\"/>" +
                 "</form>";
         resp.getWriter().println(form);
+    }
+
+    private void displayBill(HttpServletRequest req, HttpServletResponse resp) {
+        Map<String, String> params = splitParameters(req.getQueryString());
+        Customer customer = new Customer(params.get("fullname"), params.get("address"));
+        Delivery delivery = null;
+        switch (params.get("deliveryMode")) {
+            case "direct" :
+                delivery = new DirectDelivery();
+                break;
+            case "express" :
+                delivery = new ExpressDelivery(params.get("deliveryInfo"));
+                break;
+            case "relay" :
+                delivery = new RelayDelivery(Integer.parseInt(params.get("deliveryInfo")));
+                break;
+            case "takeAway" :
+                delivery = new TakeAwayDelivery();
+                break;
+        }
+        Bill bill = new Bill(customer, delivery);
+        String[] productsParams = params.get("products").split("%0D%0A");
+        for (String productLine : productsParams) {
+            String[] productAndQuantity = productLine.split("%3A");
+            Product product = products.get(Integer.parseInt(productAndQuantity[0]));
+            Integer quantity = Integer.parseInt(productAndQuantity[1]);
+            bill.addProduct(product, quantity);
+        }
+        bill.generate(new Writer() {
+            @Override
+            public void start() {
+            }
+            @Override
+            public void writeLine(String line) {
+                try {
+                    resp.getWriter().println("<br/>" + line);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void stop() {
+            }
+        });
+    }
+
+    public Map<String, String> splitParameters(String queryString){
+        String[] brutParams = queryString.split("&");
+        Map<String, String> params = new HashMap<>();
+        for (String brutParam : brutParams) {
+            String[] keyAndValue = brutParam.split("=");
+            if (keyAndValue.length == 2)
+                params.put(keyAndValue[0], keyAndValue[1]);
+        }
+        return params;
     }
 }
