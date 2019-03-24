@@ -2,13 +2,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
+
     <servlet>
-        <servlet-name>HelloWorld</servlet-name>
-        <servlet-class>com.cursan.miam.web.HelloWorldServlet</servlet-class>
+        <servlet-name>Bill</servlet-name>
+        <servlet-class>com.cursan.miam.web.BillServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>HelloWorld</servlet-name>
-        <url-pattern>/test</url-pattern>
+        <servlet-name>Bill</servlet-name>
+        <url-pattern>/bill</url-pattern>
     </servlet-mapping>
+
 </web-app>
